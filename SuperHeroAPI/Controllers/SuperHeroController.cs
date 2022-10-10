@@ -62,19 +62,21 @@ namespace SuperHeroAPI.Controllers
         [HttpPut]
         public async Task<ActionResult<List<SuperHero>>> UpdateHero(SuperHero request)
         {
-            var hero = heroes.Find(x => x.Id == request.Id);
+            var dbHero = await _context.SuperHeroes.FindAsync(request.Id);
             
-            if (hero == null)
+            if (dbHero == null)
             {
                 return BadRequest("Hero not found");
             };
+
+            dbHero.Name = request.Name;
+            dbHero.FirstName = request.FirstName;
+            dbHero.LastName = request.LastName;
+            dbHero.Place = request.Place;
+
+            await _context.SaveChangesAsync();
             
-            hero.Name = request.Name;
-            hero.FirstName = request.FirstName;
-            hero.LastName = request.LastName;
-            hero.Place = request.Place;
-            
-            return Ok(heroes);
+            return Ok(await _context.SuperHeroes.ToListAsync());
         }
 
         [HttpDelete("{id}")]
